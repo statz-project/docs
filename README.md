@@ -67,12 +67,18 @@ Our mission:
 
 ---
 
-## How to contribute
+## Contributing
 
-1. Check the open [Issues](https://github.com/stat-z/docs/issues).
+Improvements to the documentation are welcome:
+
+1. Check the open [Issues](https://github.com/statz-project/docs/issues).
 2. Fork this repository.
 3. Add or improve a tutorial.
 4. Submit a Pull Request.
+
+For contributing to the JavaScript core (code, tests, features), see the Core guide:
+
+- https://github.com/statz-project/core/blob/main/CONTRIBUTING.md
 
 ---
 
