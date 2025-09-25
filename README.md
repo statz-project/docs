@@ -50,6 +50,7 @@ Our mission:
 
 ## Tutorials
 
+* [Importing worksheet data locally](tutorials/import.md)
 * [Descriptive statistics (categorical & numeric)](tutorials/descriptive.md)
 * [Chi-square and Fisher’s exact test](tutorials/chi_fisher.md)
 * [Non-parametric tests (Mann–Whitney, Kruskal–Wallis, Dunn)](tutorials/nonparametric.md)
@@ -90,4 +91,5 @@ The analytical core is licensed under **AGPL v3**.
 ---
 
 Together, we can make statistics **accessible to everyone**.
+
 
