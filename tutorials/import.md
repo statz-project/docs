@@ -7,7 +7,7 @@ This guide shows how to mimic Bubble's upload flow from the npm workspace. The s
 - `core/test/fixtures/example.csv` – sample worksheet that exercises chi-square, Fisher, Mann-Whitney, and other tests.
 - `core/test/fixtures/plugin-output.json` – the row-wise JSON payload that Bubble's file reader sends to `window.Statz.parseColumns`.
 - `core/test/fixtures/column-hashes.json` – placeholder column hashes passed by Bubble when creating the database records. The hashes uniquely identify each column (Bubble produces them via the `formatted as` operator set to MD5 hash), so worksheets must avoid duplicate column names.
-- `core/test/utils/load-fixture.mjs` – helper that loads those fixtures and calls `Statz.parseColumns` for you.
+- `core/test/utils/load-fixture.mjs` – helper that loads `example.csv`, writes rowwise data in `plugin-output.json` and pass the rowwise payload to `Statz.parseColumns` for you.
 - `core/test/run-fixture.mjs` – CLI script used by `npm run test:fixture` to dump the parsed database JSON.
 
 ## Running the end-to-end simulation
@@ -52,4 +52,5 @@ Bubble returns the worksheet as a row-wise JSON array and keeps the column hashe
 - Share reproducible bug reports with contributors by committing CSV/JSON pairs.
 
 Because these utilities live under `core/test/`, they remain dev-only assets and are excluded from the production bundle in `core/bubble-html/statz-bundle.html`.
+
 
