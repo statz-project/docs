@@ -54,6 +54,7 @@ Our mission:
 * [Descriptive statistics (categorical & numeric)](tutorials/descriptive.md)
 * [Chi-square and Fisher’s exact test](tutorials/chi_fisher.md)
 * [Non-parametric tests (Mann–Whitney, Kruskal–Wallis, Dunn)](tutorials/nonparametric.md)
+* [Creating column variants](tutorials/variant.md)
 * [Exporting results (HTML, Markdown)](tutorials/export.md)
 
 *(more tutorials coming soon)*
