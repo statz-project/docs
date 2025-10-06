@@ -2,6 +2,8 @@
 
 The core helper in `core/json/variants.js` lets you build derived column definitions without mutating the original data. A variant is simply another entry in a column's `col_vars` array, carrying its own encoded values plus metadata that describes how it was produced. This guide walks through the pipeline that powers `variants.createVariant` and shows how to compose the most common transformations.
 
+For end-to-end examples of creating columns, reading data, and persisting variants, see [Working with dataset helpers](./dataset-helpers.md).
+
 ## How the helper works
 
 `createVariant(baseColumn, config)` decodes the source values, applies a sequence of steps, and returns a new `ColumnVariant` object. The steps run in this order:
