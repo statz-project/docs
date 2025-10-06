@@ -19,7 +19,7 @@ The function `summarize_n_q` automatically chooses the correct test depending on
 const predictor = ["5","7","6","6","10","12"];   // numeric
 const response  = ["Group A","Group A","Group A","Group B","Group B","Group B"]; // categorical
 
-const result = window.Utils.summarize_n_q(predictor, response);
+const result = window.Statz.summarize_n_q(predictor, response);
 
 console.log(result);
 ````
@@ -50,7 +50,7 @@ console.log(result);
 const predictor = ["5","7","6","6","10","12","8","9","15"];
 const response  = ["Group A","Group A","Group A","Group B","Group B","Group B","Group C","Group C","Group C"];
 
-const result = window.Utils.summarize_n_q(predictor, response);
+const result = window.Statz.summarize_n_q(predictor, response);
 
 console.log(result);
 ```
@@ -91,7 +91,7 @@ Example above shows:
 You can also export significant post-hoc results with:
 
 ```js
-const html = window.Utils.exportPosthocComparisonsAsHTML([result]);
+const html = window.Statz.exportPosthocComparisonsAsHTML([result]);
 
 console.log(html);
 ```

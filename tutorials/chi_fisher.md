@@ -2,8 +2,8 @@
 
 This tutorial explains how to perform **association tests between two categorical variables** in Stat-z, using the functions:
 
-- `window.Utils.summarize_q_q` → generates contingency tables with percentages.  
-- `window.Utils.computePValueQxQ` → calculates the p-value (Chi-square or Fisher, depending on the case).  
+- `window.Statz.summarize_q_q` → generates contingency tables with percentages.  
+- `window.Statz.computePValueQxQ` → calculates the p-value (Chi-square or Fisher, depending on the case).  
 
 ---
 
@@ -15,7 +15,7 @@ Let’s test whether **Gender** is associated with **Response**:
 const predictor = ["Male", "Male", "Female", "Female"];
 const response  = ["Yes", "No", "Yes", "No"];
 
-const result = window.Utils.summarize_q_q(predictor, response);
+const result = window.Statz.summarize_q_q(predictor, response);
 
 console.log(result);
 ````
@@ -50,7 +50,7 @@ const response  = [
   "Yes","No","Yes","No","Yes","No"
 ];
 
-const result = window.Utils.summarize_q_q(predictor, response);
+const result = window.Statz.summarize_q_q(predictor, response);
 
 console.log(result);
 ```
@@ -88,7 +88,7 @@ const observed = [
   [1, 2]
 ];
 
-const result = window.Utils.computePValueQxQ(observed, { correct: true });
+const result = window.Statz.computePValueQxQ(observed, { correct: true });
 
 console.log(result);
 ```

@@ -13,7 +13,7 @@ The function `summarize_q` computes absolute and relative frequencies.
 ```js
 const values = ["Male", "Male", "Female", "Female", "Female"];
 
-const result = window.Utils.summarize_q(values);
+const result = window.Statz.summarize_q(values);
 
 console.log(result);
 ````
@@ -47,7 +47,7 @@ const values = [
   ""
 ];
 
-const result = window.Utils.summarize_l(values, ";");
+const result = window.Statz.summarize_l(values, ";");
 
 console.log(result);
 ```
@@ -77,7 +77,7 @@ For numeric data, use `summarize_n` to compute mean, SD, median, IQR, etc.
 ```js
 const values = ["5", "7", "6", "6", "10"];
 
-const result = window.Utils.summarize_n(values);
+const result = window.Statz.summarize_n(values);
 
 console.log(result);
 ```

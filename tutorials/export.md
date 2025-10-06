@@ -16,7 +16,7 @@ Covered here:
 ## 1) Create a combined table
 
 ```js
-// suppose you already ran `window.Utils.runAnalysis(...)` and got:
+// suppose you already ran `window.Statz.runAnalysis(...)` and got:
 const resultObj = {
   analysis: [
     // array of per-predictor result objects,
@@ -25,7 +25,7 @@ const resultObj = {
   test_legend: []
 };
 
-const combined = window.Utils.combineAnalysisAsSingleTable(resultObj);
+const combined = window.Statz.combineAnalysisAsSingleTable(resultObj);
 ````
 
 The variable `combined` has the shape:
@@ -49,7 +49,7 @@ The variable `combined` has the shape:
 ## 2) Export as HTML
 
 ```js
-const html = window.Utils.exportCombinedAsHTML(combined, "Analysis Table", /* wrap */ true);
+const html = window.Statz.exportCombinedAsHTML(combined, "Analysis Table", /* wrap */ true);
 
 // If wrap=true, you get a full HTML document (good for PDF plugins).
 // If wrap=false, only the <table> fragment is returned (good for embedding).
@@ -65,7 +65,7 @@ Typical use cases:
 ## 3) Export as Markdown
 
 ```js
-const md = window.Utils.exportCombinedAsMarkdown(combined, "Analysis Table");
+const md = window.Statz.exportCombinedAsMarkdown(combined, "Analysis Table");
 // Copy/paste into docs or convert to other formats.
 ```
 
@@ -76,7 +76,7 @@ const md = window.Utils.exportCombinedAsMarkdown(combined, "Analysis Table");
 If your analysis produced post-hoc results (e.g., Dunn after Kruskal–Wallis):
 
 ```js
-const htmlPosthoc = window.Utils.exportPosthocComparisonsAsHTML(resultObj.analysis, "Significant Multiple Comparisons");
+const htmlPosthoc = window.Statz.exportPosthocComparisonsAsHTML(resultObj.analysis, "Significant Multiple Comparisons");
 ```
 
 You can append this block below the main table or show it in a popup.
@@ -88,7 +88,7 @@ You can append this block below the main table or show it in a popup.
 `exportCombinedAsRows` turns each combined row into a small, reusable object:
 
 ```js
-const items = window.Utils.exportCombinedAsRows(combined);
+const items = window.Statz.exportCombinedAsRows(combined);
 /*
 [
   { title: "Predictor name", columns: [...], rows: [ { ...one row... } ] },
