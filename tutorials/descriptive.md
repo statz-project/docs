@@ -1,13 +1,12 @@
-
 # Descriptive Statistics in Stat-z
 
-This tutorial shows how to use the **Stat-z core functions** to compute descriptive statistics for **categorical** and **numeric** variables.  
+This tutorial shows how to use the **Stat-z core functions** to compute descriptive statistics for **categorical** and **numeric** variables.
 
 ---
 
 ## 1. Summarizing categorical variables
 
-The function `summarize_q` computes absolute and relative frequencies.  
+The function `summarize_q` computes absolute and relative frequencies.
 
 ### Example
 ```js
@@ -16,7 +15,7 @@ const values = ["Male", "Male", "Female", "Female", "Female"];
 const result = window.Statz.summarize_q(values);
 
 console.log(result);
-````
+```
 
 ### Output (simplified)
 
@@ -98,6 +97,33 @@ console.log(result);
 
 ---
 
+## 4. Quick column previews
+
+`describeColumn(column, variantIndex, options)` builds a short list of strings that summarises a column or one of its variants. It is ideal for Bubble repeating groups or tooltips where you need a compact snapshot of the data.
+
+### Example
+```js
+const column = window.Statz.makeColumn([
+  'Male',
+  'Female',
+  'Female',
+  ''
+], { col_hash: 'col_gender' });
+
+const preview = window.Statz.describeColumn(column);
+
+console.log(preview);
+// ["Female: 2 (50.0%)", "Male: 1 (25.0%)", "Not reported: 1 (25.0%)"]
+```
+
+### Options
+- `variantIndex`: pass an index from `col_vars` to preview a derived column instead of the base variant.
+- `options.lang`: localise the summary using any supported Stat-z locale.
+- `options.maxRows`: limit the number of lines returned for long factor lists.
+- `options.formatFn`: provide a custom formatter used by the underlying summariser if you need bespoke strings.
+
+---
+
 ## Tips
 
 * Use `options.lang` to localize output (e.g., `"pt_br"`, `"en_us"`, `"es_es"`).
@@ -106,7 +132,4 @@ console.log(result);
 
 ---
 
-- Next tutorial: [Chi-square and Fisher’s Exact Test](chi_fisher.md)
-
-
-
+- Next tutorial: [Chi-square and Fisher's Exact Test](chi_fisher.md)
