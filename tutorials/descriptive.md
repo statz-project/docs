@@ -127,7 +127,7 @@ console.log(preview);
 ## Tips
 
 * Use `options.lang` to localize output (e.g., `"pt_br"`, `"en_us"`, `"es_es"`).
-* Use `options.stat_options` to customize numeric summaries (mean, median, min/max, etc.).
+* Use `options.stat_options` to customize numeric summaries (mean, median, min/max, etc.); add `"n_missing"` to include a missing-value count (the row appears only when any value is missing).
 * Results can be exported to **HTML**, **Markdown**, or later combined into full tables.
 
 ---
