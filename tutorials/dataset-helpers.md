@@ -25,11 +25,11 @@ console.log(genderColumn.col_vars[0].var_label); // 'Gender (original)'
 ~~~
 
 Key options:
+ - `decodeColumn(column)` turns any column or variant back into its raw array, handy right after `makeColumn` or `createVariant`.
 - `col_type` / `col_sep` override the inferred type and list separator.
 - `encode` skips factor encoding when you want to store raw strings unchanged.
 - `includeBaseVariant` and `baseVariantLabel` let you control whether the column seeds an "Original" variant automatically.
 - `col_vars` appends additional variants when you already have derived columns ready to store.
- - `decodeColumn(column)` reverses the process when you need the raw array again. It accepts either a base column or any variant, reusing `raw_values` when present and otherwise decoding from the factor payload.
 
 ## Read values from the parsed database
 
