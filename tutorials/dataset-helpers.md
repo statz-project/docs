@@ -35,6 +35,7 @@ Key options:
 
 Once the dataset has been processed by `parseColumns`, use `driver.getColumnValues(database, colHash, variantIndex)` to retrieve the decoded values for any column or variant.
 
+Need just the column metadata? Call `driver.getColumn(database, colHash)` before decoding or inspecting variants.
 ~~~js
 import driver from '../../core/json/driver.js';
 
