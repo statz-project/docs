@@ -5,7 +5,7 @@ This guide shows how to mimic Bubble's upload flow from the npm workspace. The s
 ## What ships with the repository?
 
 - `core/test/fixtures/example.csv` - sample worksheet that exercises chi-square, Fisher, Mann-Whitney, and other tests.
-- `core/test/fixtures/plugin-output.json` - the row-wise JSON payload that Bubble's file reader sends to `window.Statz.parseColumns`. It is regenerated from the CSV fixture each time you run the helper so the flow matches Bubble's upload.
+- `core/test/fixtures/plugin-output.json` - the row-wise JSON payload that Bubble's file reader sends to `window.Statz.parseColumns`. The `parseFixture` helper regenerates it automatically from the CSV fixture so the flow matches Bubble's upload.
 - `core/test/fixtures/column-hashes.json` - placeholder column hashes passed by Bubble when creating the database records. The hashes uniquely identify each column (Bubble produces them via the `formatted as` operator set to MD5 hash), so worksheets must avoid duplicate column names.
 - `core/scripts/dev/load-fixture.mjs` - helper that loads `example.csv`, writes row-wise data in `plugin-output.json`, and passes the row-wise payload to `Statz.parseColumns` for you.
 - `core/scripts/dev/run-fixture.mjs` - CLI script used by `npm run test:fixture` to dump the parsed database JSON.
@@ -21,29 +21,24 @@ This guide shows how to mimic Bubble's upload flow from the npm workspace. The s
    npm run test:fixture
    ```
    The command prints the same `{ columns, history }` JSON Bubble writes into its database after invoking `window.Statz.parseColumns`.
-3. Pipe the output into whatever analysis you want to inspect. For example, inside a Node REPL you can `import { parseFixture } from './scripts/dev/load-fixture.mjs'` and then pass `result.parsed.columns` into statistical helpers.
+3. Pipe the output into whatever analysis you want to inspect. For example, inside a Node REPL you can `import { parseFixture } from './scripts/dev/load-fixture.mjs'` and then pass `result.parsed.columns` into statistical helpers. You can also pass the dataset to helpers such as `getColumn` (see `docs/tutorials/dataset-helpers.md`) when you need to extract column values from the database payload.
 
 ## Swapping in your own worksheet
 
 1. Drop a new `.csv` under `core/test/fixtures/` (use semicolon or comma delimiters - the helper does not enforce the format).
-2. Produce the matching row-wise JSON:
-   ```powershell
-   Import-Csv core/test/fixtures/your-file.csv -Delimiter ';' | ConvertTo-Json | Set-Content core/test/fixtures/your-file.json
-   ```
-   (Use your preferred converter if you are not on PowerShell.)
-3. Copy `column-hashes.json` or craft your own array of unique identifiers that matches the column order.
-4. Call the helper with custom file names:
+2. Copy `column-hashes.json` or craft your own array of unique identifiers that matches the column order.
+3. Call the helper with custom parameters. It will regenerate the row-wise JSON for you:
    ```js
    import { parseFixture } from '../scripts/dev/load-fixture.mjs';
 
    const { parsed } = parseFixture({
      csvFile: 'your-file.csv',
-     rowsFile: 'your-file.json',
      hashesFile: 'column-hashes.json',
      filename: 'your-file.csv'
    });
    ```
-5. Feed `parsed.columns` into the statistical modules (e.g., `Statz.summarize_q_q`, `Statz.test_mann_whitney`, etc.).
+   Provide `rowsFile` if you want to persist the intermediate JSON to a different filename; otherwise the default `plugin-output.json` is reused.
+4. Feed `parsed.columns` into the statistical modules (e.g., `Statz.summarize_q_q`, `Statz.test_mann_whitney`, etc.) and lean on helpers like `getColumn` from `docs/tutorials/dataset-helpers.md` to read values from the database payload.
 
 ## How this relates to Bubble
 
