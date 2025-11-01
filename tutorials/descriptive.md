@@ -99,7 +99,7 @@ console.log(result);
 
 ## 4. Quick column previews
 
-`describeColumn(column, variantIndex, options)` builds a short list of strings that summarises a column or one of its variants. It is ideal for Bubble repeating groups or tooltips where you need a compact snapshot of the data.
+`describeColumn(column, variantIndex, options)` builds a short list of human-readable summary strings (or objects when requested) for a column or one of its variants. It is ideal for Bubble repeating groups or tooltips where you need a compact snapshot of the data.
 
 ### Example
 ```js
@@ -121,6 +121,7 @@ console.log(preview);
 - `options.lang`: localise the summary using any supported Stat-z locale.
 - `options.maxRows`: limit the number of lines returned for long factor lists.
 - `options.formatFn`: provide a custom formatter used by the underlying summariser if you need bespoke strings.
+- `options.structured`: set to `true` to receive `{ label, summary }` objects instead of the default `"label: summary"` strings.
 
 ---
 
