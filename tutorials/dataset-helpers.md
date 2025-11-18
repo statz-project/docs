@@ -110,35 +110,94 @@ driver.addVariant(database, 'col_income_hash', logVariant);
 ~~~
 
 You now have a base column plus a derived log-transformed variant stored alongside the dataset. Downstream consumers — Bubble workflows, analysis scripts, or exports — can pick the appropriate variant by index.
-
-## Managing analysis options (Bubble-friendly)
-
-When running `driver.runAnalysis` inside Bubble you often want to persist both the output JSON and the options/flags that produced it. Use `driver.getDefaultAnalysisOptions(userOptions)` to merge the defaults that ship with Stat-z and whatever choices the user made in the UI.
-
-~~~js
-// 1. Load saved options (or start empty on the first render).
-const savedOptions = element.analysis_options ? JSON.parse(element.analysis_options) : {};
-
-// 2. Merge with Statz defaults so new keys appear automatically.
-const analysisOptions = window.Statz.getDefaultAnalysisOptions(savedOptions);
-
-// 3. Run the analysis and persist the trio: result, flags, options.
-const { result, flags } = window.Statz.runAnalysis(
-  element.predictors,
-  element.responses,
-  databases,
-  analysisOptions
-);
-
-bubbleThing.set({
-  "Result JSON": JSON.stringify(result),
-  "Analysis flags": flags,
-  "Analysis options": JSON.stringify(analysisOptions)
-});
-~~~
-
-On subsequent edits, read the stored JSON, pass it back through `getDefaultAnalysisOptions`, and update the UI controls from the merged object. That pattern keeps the Bubble UI in sync with any new defaults added to Stat-z and guarantees that re-running an analysis later reproduces the same output.
-
+
+
+## Quick dataset snapshot
+
+
+Use `driver.describeDataset(database, options)` to loop through every column, collect its `describeColumn` output, and bundle variants together. The helper returns an array of `{ label, type, summary, variants }` objects that are perfect for dataset summarization.
+
+~~~js
+
+import driver from "../../core/json/driver.js";
+
+
+const overview = driver.describeDataset(database, { maxRows: 3 });
+
+overview.forEach((column) => {
+
+  console.log(column.label, column.type, column.summary);
+
+  column.variants.forEach((variant) => {
+
+    console.log("  •", variant.label, variant.summary);
+
+  });
+
+});
+
+~~~
+
+Pass the same `options` object you would send to `describeColumn` (e.g., `structured: true` or `lang: "pt_br"`).
+
+
+
+## Managing analysis options (Bubble-friendly)
+
+
+
+When running `driver.runAnalysis` inside Bubble you often want to persist both the output JSON and the options/flags that produced it. Use `driver.getDefaultAnalysisOptions(userOptions)` to merge the defaults that ship with Stat-z and whatever choices the user made in the UI.
+
+
+
+~~~js
+
+// 1. Load saved options (or start empty on the first render).
+
+const savedOptions = element.analysis_options ? JSON.parse(element.analysis_options) : {};
+
+
+
+// 2. Merge with Statz defaults so new keys appear automatically.
+
+const analysisOptions = window.Statz.getDefaultAnalysisOptions(savedOptions);
+
+
+
+// 3. Run the analysis and persist the trio: result, flags, options.
+
+const { result, flags } = window.Statz.runAnalysis(
+
+  element.predictors,
+
+  element.responses,
+
+  databases,
+
+  analysisOptions
+
+);
+
+
+
+bubbleThing.set({
+
+  "Result JSON": JSON.stringify(result),
+
+  "Analysis flags": flags,
+
+  "Analysis options": JSON.stringify(analysisOptions)
+
+});
+
+~~~
+
+
+
+On subsequent edits, read the stored JSON, pass it back through `getDefaultAnalysisOptions`, and update the UI controls from the merged object. That pattern keeps the Bubble UI in sync with any new defaults added to Stat-z and guarantees that re-running an analysis later reproduces the same output.
+
+
+
 
 ## Tips for contributors
 
