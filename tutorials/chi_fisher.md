@@ -102,6 +102,37 @@ console.log(result);
 }
 ```
 
+## Summarizing list predictors vs qualitative responses
+
+Sometimes a predictor column is a **list field** (e.g., `"fever;headache"`).  
+
+Use `window.Statz.summarize_l_q` to automatically split the list into binary indicators and run `summarize_q_q` for each item.
+
+```js
+const clinics = [
+  "headache;overweight",
+  "dm;fever",
+  "headache",
+  ""
+];
+
+const income = ["low", "high", "high", "low"];
+
+const results = window.Statz.summarize_l_q(
+  clinics,
+  income,
+  null,
+  { lang: "en_us" },
+  { predictorLabel: "Clinics" }
+);
+
+results.forEach(entry => {
+  console.log(entry.label, entry.table.test_used, entry.table.p_value);
+});
+```
+
+Each entry in `results` represents a 2×2 chi-square (or Fisher) test comparing the presence/absence of a list value (e.g., `"headache"`) versus the qualitative response (`income` in the example).
+
 ---
 
 ## Interpretation tips
@@ -116,3 +147,4 @@ console.log(result);
 
 * Try [Non-parametric tests](nonparametric.md) for numeric variables vs. groups.
 
+---
