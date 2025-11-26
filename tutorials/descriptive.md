@@ -87,8 +87,8 @@ console.log(result);
 {
   "columns": ["Variable", "Description"],
   "rows": [
-    { "Variable": "Mean (SD)", "Description": "6.8 (1.9)" },
-    { "Variable": "Median (IQR)", "Description": "6.0 (2.0)" },
+    { "Variable": "Mean ± SD", "Description": "6.8 ± 1.9" },
+    { "Variable": "Median ± IQR", "Description": "6.0 ± 2.0" },
     { "Variable": "n", "Description": "5" }
   ],
   "summary": { "n": 5 }
