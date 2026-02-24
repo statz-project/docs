@@ -108,3 +108,19 @@ const items = window.Statz.exportCombinedAsRows(combined);
 * If your q×q tables used residual symbols (†, \*), the footer will note their meaning.
 * When exporting to PDF, prefer the **HTML full document** (`wrap=true`) for best results.
 
+---
+
+## 7) Quick HTML viewer for a database payload
+
+Render a saved database payload (`{ columns: [...] }`) as a lightweight HTML table:
+
+```js
+const html = window.Statz.exportDatabaseAsHTML(dbPayload, { maxRows: 200 }); // includeStyles:false to skip CSS
+// Insert `html` into your page, an iframe, or hand off to a PDF generator.
+```
+
+Notes:
+- Decodes column values before rendering.
+- Defaults to 200 rows; set `maxRows` as needed.
+- Includes minimal sticky-header styling unless `includeStyles:false`.
+
