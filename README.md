@@ -56,6 +56,7 @@ Our mission:
 * [Non-parametric tests (Mann–Whitney, Kruskal–Wallis, Dunn)](tutorials/nonparametric.md)
 * [Creating column variants](tutorials/variant.md)
 * [Exporting results (HTML, Markdown)](tutorials/export.md)
+* [Working with dataset helpers](tutorials/dataset-helpers.md)
 
 *(more tutorials coming soon)*
 
