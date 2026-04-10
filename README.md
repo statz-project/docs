@@ -51,12 +51,13 @@ Our mission:
 ## Tutorials
 
 * [Importing worksheet data locally](tutorials/import.md)
+* [Exporting results (HTML, Markdown)](tutorials/export.md)
 * [Descriptive statistics (categorical & numeric)](tutorials/descriptive.md)
 * [Chi-square and Fisher’s exact test](tutorials/chi_fisher.md)
 * [Non-parametric tests (Mann–Whitney, Kruskal–Wallis, Dunn)](tutorials/nonparametric.md)
-* [Creating column variants](tutorials/variant.md)
-* [Exporting results (HTML, Markdown)](tutorials/export.md)
 * [Working with dataset helpers](tutorials/dataset-helpers.md)
+* [Column processing (sort, top N, exclusions, NA handling)](tutorials/processing.md)
+* [Creating column variants](tutorials/variant.md)
 
 *(more tutorials coming soon)*
 
