@@ -109,8 +109,26 @@ const logVariant = variants.createVariant({
 driver.addVariant(database, 'col_income_hash', logVariant);
 ~~~
 
-You now have a base column plus a derived log-transformed variant stored alongside the dataset. Downstream consumers — Bubble workflows, analysis scripts, or exports — can pick the appropriate variant by index.
+You now have a base column plus a derived log-transformed variant stored alongside the dataset. Downstream consumers - Bubble workflows, analysis scripts, or exports - can pick the appropriate variant by index.
 
+
+## Search & replace values in a column
+
+`factors.replaceColumnValues(column, search, replace)` rewrites the values of a column based on parallel `search`/`replace` arrays, re-encodes them, and returns a **new** column object (the input is never mutated). For list columns, replacements are applied item-by-item within the separator.
+
+~~~js
+import factors from '../../core/json/factors.js';
+
+const cleaned = factors.replaceColumnValues(
+  sexColumn,
+  ['m', 'f', 'unknown'],
+  ['Male', 'Female', '']
+);
+~~~
+
+The function stores an audit trail in `column.meta.replacements` as an array of `{ from, to }` pairs. This metadata is preserved through `applyColumnMappings`: when a dataset is re-imported against an existing database, any replacements recorded on the old column are automatically re-applied to the new column that was mapped to it, so manual clean-ups survive re-imports. Empty `to` values effectively drop the matching entries (they become missing after re-encoding).
+
+Unlike `meta.processing` (see [processing.md](processing.md)), replacements are **destructive**: they are baked into `col_values` at the moment `replaceColumnValues` is called. The `meta.replacements` array exists solely as an audit/replay trail for future imports.
 
 ## Quick dataset snapshot
 
@@ -130,7 +148,7 @@ overview.forEach((column) => {
 
   column.variants.forEach((variant) => {
 
-    console.log("  •", variant.label, variant.summary);
+    console.log("  -", variant.label, variant.summary);
 
   });
 
