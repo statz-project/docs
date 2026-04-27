@@ -31,10 +31,13 @@ Processing options are stored in `column.meta.processing` and applied non-destru
 
 ## Order of Application
 
-1. NA handling (`na_action`, `na_label`)
-2. Excluded values (`excluded_values`)
-3. Sort levels (`sort_mode`, `custom_order`) -- qualitative only
-4. Top N grouping (`top_n`, `top_n_label`) -- qualitative only
+0. **Replacements** (`meta.replacements`) -- already baked into `col_values` by `replaceColumnValues` (destructive, before `applyProcessing` runs)
+1. **Excluded values** (`excluded_values`) -- excluded entries are set to empty
+2. **NA handling** (`na_action`, `na_label`) -- only labels rows that were *originally* missing; rows that became empty due to step 1 stay empty
+3. **Sort levels** (`sort_mode`, `custom_order`) -- qualitative only; the NA label participates in frequency ordering
+4. **Top N grouping** (`top_n`, `top_n_label`) -- qualitative only; "Others" is the final result
+
+Each step operates on progressively cleaner data: exclusions are removed first so NA / sort / top_n act only on kept values, while still distinguishing user-excluded entries from genuine missing data.
 
 ## Usage
 
