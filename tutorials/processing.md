@@ -31,18 +31,23 @@ Processing options are stored in `column.meta.processing` and applied non-destru
 
 ## Order of Application
 
-0. **Replacements** (`meta.replacements`) -- already baked into `col_values` by `replaceColumnValues` (destructive, before `applyProcessing` runs)
+0. **Replacements** (`meta.replacements`) -- applied lazily by `applyReplacements` (see [dataset-helpers.md](dataset-helpers.md#search--replace-values-in-a-column))
 1. **Excluded values** (`excluded_values`) -- excluded entries are set to empty
 2. **NA handling** (`na_action`, `na_label`) -- only labels rows that were *originally* missing; rows that became empty due to step 1 stay empty
 3. **Sort levels** (`sort_mode`, `custom_order`) -- qualitative only; the NA label participates in frequency ordering
 4. **Top N grouping** (`top_n`, `top_n_label`) -- qualitative only; "Others" is the final result
 
-Each step operates on progressively cleaner data: exclusions are removed first so NA / sort / top_n act only on kept values, while still distinguishing user-excluded entries from genuine missing data.
+Each step operates on progressively cleaner data: replacements normalize the values, then exclusions are removed so NA / sort / top_n act only on kept values, while still distinguishing user-excluded entries from genuine missing data.
+
+The canonical read-time helper that runs the full pipeline (replacements + processing) is `factors.resolveColumn(column, options)`. The analysis pipeline (`runAnalysis`, `describeColumn`, `exportDatabaseAsHTML`) calls it automatically.
 
 ## Usage
 
 ```javascript
-// Direct usage
+// Full pipeline (replacements + processing) — preferred
+const resolved = Statz.resolveColumn(column);
+
+// Just the processing step (skip replacements)
 const processed = Statz.applyProcessing(column);
 const processed2 = Statz.applyProcessing(column, { excluded_values: ['unknown'] });
 

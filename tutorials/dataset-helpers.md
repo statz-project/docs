@@ -114,21 +114,33 @@ You now have a base column plus a derived log-transformed variant stored alongsi
 
 ## Search & replace values in a column
 
-`factors.replaceColumnValues(column, search, replace)` rewrites the values of a column based on parallel `search`/`replace` arrays, re-encodes them, and returns a **new** column object (the input is never mutated). For list columns, replacements are applied item-by-item within the separator.
+`factors.recordReplacements(column, search, replace)` records search/replace pairs into `column.meta.replacements` and returns a **new** column object (the input is never mutated). It is **non-destructive**: `col_values` is not modified — the substitutions are applied lazily at read-time by `factors.applyReplacements` (or transparently via `factors.resolveColumn`, which the analysis pipeline calls automatically).
 
 ~~~js
 import factors from '../../core/json/factors.js';
 
-const cleaned = factors.replaceColumnValues(
+const cleaned = factors.recordReplacements(
   sexColumn,
   ['m', 'f', 'unknown'],
   ['Male', 'Female', '']
 );
+// cleaned.col_values === sexColumn.col_values  (unchanged)
+// cleaned.meta.replacements === [{from:'m',to:'Male'},{from:'f',to:'Female'},{from:'unknown',to:''}]
 ~~~
 
-The function stores an audit trail in `column.meta.replacements` as an array of `{ from, to }` pairs. This metadata is preserved through `applyColumnMappings`: when a dataset is re-imported against an existing database, any replacements recorded on the old column are automatically re-applied to the new column that was mapped to it, so manual clean-ups survive re-imports. Empty `to` values effectively drop the matching entries (they become missing after re-encoding).
+`recordReplacements` is a **setter** for `meta.replacements`: each call overwrites the previous list with the current set of pairs (entries where `from === to` are dropped). For list columns, replacements are applied item-by-item within the separator at read-time. Empty `to` values effectively drop the matching entries during read (they become missing after re-encoding).
 
-Unlike `meta.processing` (see [processing.md](processing.md)), replacements are **destructive**: they are baked into `col_values` at the moment `replaceColumnValues` is called. The `meta.replacements` array exists solely as an audit/replay trail for future imports.
+The `meta.replacements` array is preserved through `applyColumnMappings`. On re-import against an existing database, the old column's `meta.replacements` survives the metadata merge — no destructive replay is needed; the substitutions auto-apply on the next read.
+
+### Reading values with replacements applied
+
+- `factors.applyReplacements(column)` — returns a new column with `col_values` substituted according to `meta.replacements`.
+- `factors.resolveColumn(column)` — canonical read-time helper: applies `meta.replacements`, then `meta.processing` (see [processing.md](processing.md)). Use this whenever you want the "fully resolved" view of a column.
+- `factors.getIndividualItems(column)` and `factors.getIndividualItemsWithCount(column)` apply replacements by default (matching the post-replacement view). Pass `{ applyReplacements: false }` to inspect raw values (useful when populating a replacements editor).
+
+### Replacements + processing rules stay coherent
+
+`applyReplacements` also auto-translates fields of `meta.processing` that reference column values (`excluded_values`, `custom_order`) through the same replacement map. So if you exclude `female` and later rename `female → Female`, the exclusion still applies (now to `Female`). The persisted `meta.processing` is **not** mutated — translation lives only in the resolved (in-memory) view, so the editor UI keeps showing the user's original rules.
 
 ## Quick dataset snapshot
 
