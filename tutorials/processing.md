@@ -12,9 +12,9 @@ Processing options are stored in `column.meta.processing` and applied non-destru
 | `custom_order` | string[] | `[]` | q | Custom level order (when `sort_mode = "custom"`) |
 | `top_n` | number\|null | `null` | q | Keep only top N levels; group rest under `top_n_label` |
 | `top_n_label` | string | `"Others"` | q | Label for the grouped "others" category |
-| `na_action` | string | `"keep"` | q, n, l | `"keep"` = leave as missing; `"label"` = replace with `na_label` |
+| `na_action` | string | `"keep"` | q, n, l | `"keep"` = leave as missing; `"label"` = replace ALL missing (originally empty + excluded) with `na_label` |
 | `na_label` | string | `"Not informed"` | q, n, l | Replacement label when `na_action = "label"` |
-| `excluded_values` | string[] | `[]` | q, n, l | Values to exclude from analysis |
+| `excluded_values` | string[] | `[]` | q, n, l | Values to treat as missing. With `na_action: "keep"` they disappear; with `na_action: "label"` they collapse into `na_label`. |
 
 ## When Processing is Applied
 
@@ -32,12 +32,12 @@ Processing options are stored in `column.meta.processing` and applied non-destru
 ## Order of Application
 
 0. **Replacements** (`meta.replacements`) -- applied lazily by `applyReplacements` (see [dataset-helpers.md](dataset-helpers.md#search--replace-values-in-a-column))
-1. **Excluded values** (`excluded_values`) -- excluded entries are set to empty
-2. **NA handling** (`na_action`, `na_label`) -- only labels rows that were *originally* missing; rows that became empty due to step 1 stay empty
+1. **Excluded values** (`excluded_values`) -- excluded entries become empty (treated as missing)
+2. **NA handling** (`na_action`, `na_label`) -- when `na_action = "label"`, **all** empty rows (originally missing OR just excluded in step 1) are relabeled with `na_label`
 3. **Sort levels** (`sort_mode`, `custom_order`) -- qualitative only; the NA label participates in frequency ordering
 4. **Top N grouping** (`top_n`, `top_n_label`) -- qualitative only; "Others" is the final result
 
-Each step operates on progressively cleaner data: replacements normalize the values, then exclusions are removed so NA / sort / top_n act only on kept values, while still distinguishing user-excluded entries from genuine missing data.
+Conceptually, `excluded_values` defines **what counts as missing** and `na_action`/`na_label` decides **how missing values are displayed**. The two are complementary: excluding a value with `na_action: "keep"` makes it disappear from the analysis; excluding with `na_action: "label"` collapses it into the NA label, alongside originally-empty rows.
 
 The canonical read-time helper that runs the full pipeline (replacements + processing) is `factors.resolveColumn(column, options)`. The analysis pipeline (`runAnalysis`, `describeColumn`, `exportDatabaseAsHTML`) calls it automatically.
 
