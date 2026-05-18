@@ -154,4 +154,17 @@ You can surface the metadata anywhere you list variants -- for example, in audit
 
 `variants.VARIANT_TEMPLATES` exposes presets for qualitative (`'q'`), numeric (`'n'`), and list (`'l'`) columns. Each template lists the configurable options needed to power quick actions in the UI. Start with these IDs when wiring dropdowns or buttons in Bubble, and pass the matching options into `createVariant`.
 
+`variants.TRANSFORM_ORDER` gives the canonical pipeline order of the operations. Use it to render steps in sequence and to reset downstream panels when an upstream step is edited.
+
+`variants.OPERATION_DEFAULTS` maps each recipe operation key to a sensible initial value, so the UI can seed a freshly-enabled operation in the recipe draft:
+
+```js
+// When the user enables a template, initialize its draft state:
+const optionKey = template.options[0];                 // e.g. 'cut'
+const draft = structuredClone(window.Statz.OPERATION_DEFAULTS[optionKey]);
+// draft === { breaks: [], labels: [], right: true, includeLowest: true }
+```
+
+The keys align with `VARIANT_TEMPLATES[type][].options[]` and the canonical recipe shape produced by `normalizeRecipe`. Note the search & replace default is keyed `replacements` (not `searchReplace`). Always deep-clone the default before mutating it — `OPERATION_DEFAULTS` is a shared constant.
+
 With these building blocks you can script reproducible data-cleaning steps, keep survey scripts tidy, and help Bubble users understand exactly how each derived column was produced.
