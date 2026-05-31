@@ -154,6 +154,16 @@ You can surface the metadata anywhere you list variants -- for example, in audit
 
 `variants.VARIANT_TEMPLATES` exposes presets for qualitative (`'q'`), numeric (`'n'`), and list (`'l'`) columns. Each template lists the configurable options needed to power quick actions in the UI. Start with these IDs when wiring dropdowns or buttons in Bubble, and pass the matching options into `createVariant`.
 
+Each template carries both a static English `label` (backward-compat fallback) and a `labelKey` that resolves through the `core/i18n` module. For localized UI labels, prefer `variants.getVariantTemplates(lang)` — it returns a deep-cloned copy of `VARIANT_TEMPLATES` with each `label` resolved for the requested language (`'en_us'`, `'pt_br'`, `'es_es'`):
+
+```js
+const templates = window.Statz.getVariantTemplates('pt_br').q;
+// templates[0].label === 'Buscar e substituir níveis'
+// templates[0].labelKey === 'variants.templates.search_replace.q'
+```
+
+Translation keys live under `variants.templates.*` in `core/i18n/index.js`. The static `VARIANT_TEMPLATES.[type][i].label` field remains for code that does not need localization.
+
 `variants.TRANSFORM_ORDER` gives the canonical pipeline order of the operations. Use it to render steps in sequence and to reset downstream panels when an upstream step is edited.
 
 `variants.OPERATION_DEFAULTS` maps each recipe operation key to a sensible initial value, so the UI can seed a freshly-enabled operation in the recipe draft:
