@@ -6,7 +6,7 @@ For end-to-end examples of creating columns, reading data, and persisting varian
 
 ## How the helper works
 
-`createVariant(baseColumn, config)` decodes the source values, applies a sequence of steps, and returns a new `ColumnVariant` object. The steps run in this order:
+`createVariant(baseColumn, config)` first **resolves the source** (applies the source's `meta.replacements` and `meta.processing` via `factors.resolveColumn`) so the variant operates on the user's effective view of the data, not raw `col_values`. Then it decodes those resolved values, applies a sequence of steps, and returns a new `ColumnVariant` object. The steps run in this order:
 
 1. `fillEmpty` -> replace blank entries with the provided fallback.
 2. `replacements` / `searchReplace` -> rewrite individual values (works with list-style entries as well).
@@ -16,6 +16,8 @@ For end-to-end examples of creating columns, reading data, and persisting varian
 6. `transform` -> apply `log`, `log10`, `log2`, `sqrt`, or `square` to numeric inputs.
 7. `cut` -> convert numeric values into labeled intervals.
 8. Explicit overrides (`col_type`, `col_sep`, `sortByFrequency`, `note`).
+
+Because source resolution runs first, configurations like `excluded_values` or `replacements` set on the source column propagate naturally into the variant: a sentinel marked `excluded_values: ["999"]` will arrive at the pipeline as empty, not as `999`. The variant's own operations target the resolved values (e.g., if the source has `replacements: [{from:'m', to:'male'}]`, your variant's `replacements: [{from:'male', to:'Male'}]` matches the resolved label, not the raw `m`).
 
 At every stage the helper records `meta.actions` and `meta.warnings`, so the UI can display what happened. When you append the returned variant to an existing column, the original data remains untouched.
 

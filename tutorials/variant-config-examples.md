@@ -2,6 +2,8 @@
 
 Minimal JSON examples of the `config` object accepted by `createVariant(baseCol, config)`. One block per operation. Use these as the shape the Bubble UI must produce per panel.
 
+> **Source resolution:** `createVariant` applies the source's `meta.replacements` and `meta.processing` (via `resolveColumn`) **before** running the pipeline. So your operation keys below target the *resolved* values of the source, not raw `col_values`. Example: if the source has `meta.replacements: [{from: "m", to: "male"}]`, write `replacements: [{from: "male", to: "Male"}]` in the variant config — `"m"` will never reach the pipeline.
+
 ## Common shell
 
 Every config carries a small set of meta fields (none required by the pipeline, but recommended for traceability):
