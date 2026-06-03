@@ -170,6 +170,25 @@ overview.forEach((column) => {
 
 Pass the same `options` object you would send to `describeColumn` (e.g., `structured: true` or `lang: "pt_br"`).
 
+### `describeDataset` options
+
+| Option | Type | Default | Description |
+|---|---|---|---|
+| `lang` | string | `"en_us"` | Locale for translated summary labels. |
+| `formatFn` | Function | — | Optional value formatter forwarded to `describeColumn`. |
+| `maxRows` | number | — | Max rows per summary (forwarded). |
+| `structured` | boolean | `false` | When `true`, returns objects instead of formatted strings. |
+| `includeDeleted` | boolean | `false` | When `true`, includes columns flagged `col_del: true`. |
+| `includeBaseAsVariant` | boolean | `true` | When `false`, drops the pointer-style base variant (`col_vars[0]`) from `variants`, keeping only user-created derived variants (indices ≥ 1). |
+
+`includeBaseAsVariant` is useful when you want a clean list of derived variants. The default keeps the base for backward compatibility, but its `summary` is always empty (the column-level `summary` already represents the base — `col_vars[0]` is just a label/meta pointer).
+
+~~~js
+const overview = driver.describeDataset(database, { includeBaseAsVariant: false });
+// overview[i].variants contains only derived variants (search_replace, cut, etc.) —
+// no empty-summary entry for col_vars[0].
+~~~
+
 
 
 ## Managing analysis options (Bubble-friendly)
