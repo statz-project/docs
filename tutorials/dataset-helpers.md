@@ -73,6 +73,8 @@ driver.addVariant(database, column.col_hash, cleaned);
 
 If the target column does not yet have a `col_vars` array, `addVariant` seeds an "Original" variant for you before appending the new entry. The function throws when the column hash cannot be found, so make sure you carry the hash returned by `parseColumns` through your workflow.
 
+For editing or removing variants after they have been added, the same `driver` namespace exposes `replaceVariantAt(database, colHash, editIndex, newVariant)` and `removeVariantAt(database, colHash, removeIndex)`. Both helpers re-replay downstream variants against the updated chain and return a `warnings` array for the UI to surface. The related `recodeColumn(column, { col_type, col_sep })` rebuilds a column under a new type or list separator, reusing the same cascading replay.
+
 ## End-to-end recipe
 
 ~~~js

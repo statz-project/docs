@@ -15,7 +15,7 @@ For end-to-end examples of creating columns, reading data, and persisting varian
 5. `forceNumeric` -> coerce cleaned text into numeric strings, logging drops and edits.
 6. `transform` -> apply `log`, `log10`, `log2`, `sqrt`, or `square` to numeric inputs.
 7. `cut` -> convert numeric values into labeled intervals.
-8. Explicit overrides (`col_type`, `col_sep`, `sortByFrequency`, `note`).
+8. Explicit overrides (`col_type`, `col_sep`, `note`) and level ordering (`sort_mode`, `custom_order`).
 
 Because source resolution runs first, configurations like `excluded_values` or `replacements` set on the source column propagate naturally into the variant: a sentinel marked `excluded_values: ["999"]` will arrive at the pipeline as empty, not as `999`. The variant's own operations target the resolved values (e.g., if the source has `replacements: [{from:'m', to:'male'}]`, your variant's `replacements: [{from:'male', to:'Male'}]` matches the resolved label, not the raw `m`).
 
@@ -131,7 +131,19 @@ console.table(buckets.meta.breaks);
 - `replacements` / `searchReplace` accept `{ search, replace }` pairs; helpers also understand Bubble-style `{ from, to }` or `{ level, label }` keys.
 - `merges` collapse multiple levels into a single label (`{ label, levels: [] }`).
 - `subsetLevels` whitelists values to keep; everything else becomes blank.
-- `sortByFrequency` reorders factor labels based on observed frequency and remaps the encoded codes to match.
+
+**Level ordering (q only)**
+
+Variants mirror the column-level `meta.processing` ordering API (see [processing.md](processing.md)):
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `sort_mode` | string | `"default"` | Level ordering: `"default"`, `"freq_desc"`, `"freq_asc"`, `"alpha"`, `"custom"` |
+| `custom_order` | string[] | `[]` | Custom level order (when `sort_mode = "custom"`); labels not listed go to the tail in original order |
+
+`"default"` keeps the natural order produced by the pipeline (R-style, source order or merged-group position). The other modes override that final order. `custom_order` lets a variant impose a level ordering different from the source column's.
+
+Legacy `sortByFrequency: true` is still accepted as an alias for `sort_mode: "freq_desc"` and is canonicalized into the modern shape by `normalizeRecipe` when the recipe is stored.
 
 **Numeric handling**
 - `forceNumeric` coerces each value to a canonical numeric string. Non-parsable entries turn into empty strings.
