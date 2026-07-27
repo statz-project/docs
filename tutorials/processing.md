@@ -21,6 +21,8 @@ Processing options are stored in `column.meta.processing` and applied non-destru
 - `runAnalysis`: applies processing before computing statistics
 - `describeDataset` / `describeColumn`: applies processing before generating summaries
 - `exportDatabaseAsHTML`: applies processing before rendering (opt-out via `{ applyProcessing: false }`)
+- `buildMissingMap` / `exportMissingMapAsHTML`: apply processing before counting missing values (opt-out via `{ applyProcessing: false }`)
+- `buildCrosstab` / `exportCrosstabAsHTML`: apply processing on **both** axes before cross-tabulating (opt-out via `{ applyProcessing: false }`)
 
 ## When Processing is NOT Applied
 
@@ -40,6 +42,21 @@ Processing options are stored in `column.meta.processing` and applied non-destru
 Conceptually, `excluded_values` defines **what counts as missing** and `na_action`/`na_label` decides **how missing values are displayed**. The two are complementary: excluding a value with `na_action: "keep"` makes it disappear from the analysis; excluding with `na_action: "label"` collapses it into the NA label, alongside originally-empty rows.
 
 The canonical read-time helper that runs the full pipeline (replacements + processing) is `factors.resolveColumn(column, options)`. The analysis pipeline (`runAnalysis`, `describeColumn`, `exportDatabaseAsHTML`) calls it automatically.
+
+### How processing shows up in the missing-data map
+
+`buildMissingMap` / `exportMissingMapAsHTML` ([export.md](export.md#8-missing-data-map)) count
+missing values on the resolved view, so the two processing options that define missingness are
+directly visible there:
+
+| Processing | Effect on the map |
+|---|---|
+| `excluded_values` | Those rows become empty in step 1 → they **appear as holes**. |
+| `na_action: "label"` | Step 2 turns every empty row into a real category → the column reports **zero** missing. |
+
+Both are intended: the map answers "how much data is missing **after** my edits", the same question
+`runAnalysis` answers. `{ applyProcessing: false }` is the escape hatch for seeing the original
+import. The canonical per-value test is `factors.isMissingValue(value, col_type, col_sep)`.
 
 ## Usage
 

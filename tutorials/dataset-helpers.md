@@ -51,6 +51,33 @@ console.log(secondPass.variant?.var_label);
 
 The helper normalizes separators, decodes list columns, and falls back to the base column values when `variantIndex` is omitted.
 
+### Reading the FINAL values: `factors.resolveVariable`
+
+`getColumnValues` resolves the variant but **does not apply `meta.replacements` / `meta.processing`** — it returns the values as stored. When you want the same data the analyses see, use `factors.resolveVariable(db, colHash, varIndex, options)`:
+
+~~~js
+import factors from '../../core/json/factors.js';
+
+const v = factors.resolveVariable(database, 'col_sex_hash', 1);
+// → { column, variant, varIndex, label, colType, colSep, colValues, values }
+
+v.values;    // decoded, replacements + processing applied — what runAnalysis works on
+v.label;     // variant.var_label ?? column.col_label ?? column.col_name
+v.colValues; // resolved col_values, so `colValues.labels` is the post-processing factor order
+
+// Escape hatch: the original, unedited import
+factors.resolveVariable(database, 'col_sex_hash', 1, { applyProcessing: false });
+~~~
+
+This is the canonical way to turn a `col_hash` + variant index into usable values, and the reusable form of a chain still inlined in `runAnalysis`, `describeColumn`, `getColumnValues` and `collectDecodedColumns`. New code should call it rather than re-deriving the chain.
+
+Two behaviours worth knowing:
+
+- **`varIndex` is coerced from UI-typed input.** `''`, `'  '`, `null`, `undefined`, a non-integer, a negative value, or an index past the end of `col_vars` all resolve to the **base column**, silently — the same fallback as `getColumnValues`. `'1'` as a string works. The resolved index is echoed back as `varIndex`, so a caller can detect the fallback. Never throws; returns `null` only when the db has no `columns` array or the hash matches nothing.
+- **Meta fallback is per field.** A variant that declares only `meta.processing` still inherits the column's `meta.replacements`, and vice versa. (`describeColumn` uses a whole-object fallback and `collectDecodedColumns` has none — those diverge and are known issues, not the intended contract.)
+
+Pointer-style variants — `col_vars[0]`, which carries only a label and no `col_values` — are folded onto their parent automatically.
+
 ## Append a new variant to the dataset
 
 After calling `variants.createVariant`, persist the result with `driver.addVariant(database, colHash, newVariant)`.

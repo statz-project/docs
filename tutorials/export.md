@@ -124,3 +124,93 @@ Notes:
 - Defaults to 200 rows; set `maxRows` as needed.
 - Includes minimal sticky-header styling unless `includeStyles:false`.
 
+---
+
+## 8) Missing data map
+
+The analog of R's `DescTools::PlotMiss()`: one row per column, a raster of the observation sequence,
+and the missing count on the right. It answers *where* the holes are — systematic drop-out at the
+end of collection looks nothing like scattered item non-response, even at the same total count.
+
+```js
+const html = window.Statz.exportMissingMapAsHTML(dbPayload, { title: 'Cohort 2024' });
+// Or just the numbers, without building the HTML:
+const map = window.Statz.buildMissingMap(dbPayload);   // → { nRows, columns: [...] } | null
+```
+
+Options: `title`, `lang`, `includeStyles`, `includeTitles`, `showDeletedColumns` (default `false`),
+`showVariants` (default `true`), `applyProcessing` (default `true`), `maxBins`, `showPercent`,
+`missingColor`, `presentColor`, `nameWidth`, `rowHeight`. Columns always keep their natural
+database order.
+
+Notes:
+- `title` (usually the database name) renders as a centred `<caption>`. **There is no default** —
+  omit it and no caption is emitted at all, so the page can show the name wherever it likes. Same
+  contract as `exportDatabaseAsHTML` in section 7, which never invents a table title either.
+- **It reports the FINAL data** — the resolved view (`meta.replacements` + `meta.processing`),
+  exactly what `runAnalysis` sees. So `excluded_values` count as missing, and a column processed
+  with `na_action: 'label'` reports **no** missing data, because the user turned those rows into a
+  real category. Pass `applyProcessing: false` to inspect the original, unedited import instead.
+  See [processing.md](processing.md#when-processing-is-applied).
+- **`maxBins` (default 300) reduces raster RESOLUTION, it never truncates** — unlike `maxRows` in
+  section 7, every observation always falls inside some bin. When `nRows > maxBins`, consecutive
+  observations are grouped and a bin is marked when **any** observation inside it is missing, so
+  nothing ever disappears at low resolution.
+- A column shorter than the longest one is padded, and the padding counts as missing.
+- Zero missing anywhere still renders the full grid, all clear, with `0` in every count cell —
+  that is the most useful answer the widget can give, so it is never an empty result.
+- Output is script-free and safe for `innerHTML`. Size scales with the number of missing *runs*,
+  not observations — for a 30 × 5000 database: ~95 KB with scattered item non-response, ~13 KB for
+  tail drop-out. Lower `maxBins` to shrink it further.
+
+---
+
+## 9) Counts-only contingency preview (xtabs)
+
+The analog of R's `xtabs()`: a raw cross-tabulation between two variables/variants of the same
+database, so you can look at the joint distribution *before* deciding what to test. **No inferential
+statistics** — no χ², no p-value, no percentages, no effect sizes. Use `runAnalysis` for those.
+
+```js
+// (db, rowHash, rowVarIndex, colHash, colVarIndex, options)
+// The variant index is '' (or null) for the base column, or the col_vars position.
+const html = window.Statz.exportCrosstabAsHTML(db, 'h_faixa', '', 'h_sexo', '', { title: 'Coorte 2024' });
+
+// Or just the numbers:
+const ct = window.Statz.buildCrosstab(db, 'h_faixa', '', 'h_sexo', '');
+// → { row, col, counts, nRows, nCompared, nExcluded, isMultiResponse } | null
+```
+
+Options: `title`, `lang`, `includeStyles`, `includeTitles`, `applyProcessing` (default `true`),
+`maxLevels` (default `100`).
+
+Notes:
+- **Cells only — no marginal totals**, like a plain `xtabs()` printout. `buildCrosstab` returns the
+  bare `counts` matrix too; sum it yourself if you need totals.
+- **Level order follows the variable's type**, mirroring R's `factor()`:
+  - `q` — factor order from `col_values.labels`, **keeping declared-but-unused levels as zero rows**;
+    alphabetical when the column isn't factor-compacted.
+  - `n` — **numeric**, so you get 2, 10, 100 rather than the lexical 1, 10, 2. `"1"` and `"1.0"`
+    deliberately stay *distinct* levels: values arrive as strings from the import, and a preview
+    whose job is to surface data quality must show that both spellings exist.
+  - `l` — split by `col_sep` into items, alphabetical, **observed items only**.
+- **`l` axes count presence, not occurrences.** `"a;a"` increments its cell once. This makes
+  `l × l` a single co-occurrence matrix, so it works here even though `summarize_l_l` requires a
+  `subset_items` constraint (there is no combinatorial explosion of tests to cap).
+- With an `l` axis a record is counted in every cell its items reach, so **summing the cells yields
+  more than `n`**. `buildCrosstab` reports `isMultiResponse` and `nCompared` (records actually
+  compared) so a page that does compute totals can explain the discrepancy.
+- **Always complete-case.** A record missing on either axis is dropped from every cell and counted
+  in `nExcluded`; there is no `includeMissing` option. Reads the resolved view, so `excluded_values`
+  count as missing and `na_action: 'label'` becomes a real level — see
+  [processing.md](processing.md#when-processing-is-applied). `applyProcessing: false` inspects the
+  original import.
+- **`maxLevels` truncates by membership** — it keeps the most frequent levels, preserving their
+  canonical order, and **discloses the truncation in a footer note** (the only note emitted).
+  Contrast with `maxBins` in section 8, which reduces resolution and never truncates. Cells =
+  rows × cols, so the default 100 × 100 is already past readable; lower it for wide previews.
+- No default title: omit `title` and no `<caption>` is emitted, as in sections 7 and 8.
+- Returns `''` (`null` from `buildCrosstab`) when the db is unusable, a hash is unknown, or an axis
+  yields no levels. A `q × q` pair with declared levels but **zero** complete cases still renders an
+  all-zero table — "these two are never both observed" is informative.
+
